@@ -36,7 +36,7 @@ rule test_model:
 
 
 rule download_dataset:
-    input:
+    output:
         "ECG_Rhythm_Lead_I.csv"
     threads: 1
     run:
@@ -56,6 +56,7 @@ rule prepare_dataset:
         'test.txt',
         'test_labels.txt',
         report("signal_example.png", category="Dataset"),
+        report("norm_signal_example.png", category="Dataset"),
         report("label_hist.png", category="Dataset"),
     threads: 1
     run:
@@ -146,7 +147,7 @@ rule build_model:
         "weights.hdf5",
         report("model.png", category="ML Model"),
         report("LRFinder-learning.png", category="ML Model"),
-        report("norm_signal_example.png", category="Dataset")
+
     run:
         import os
 
@@ -163,10 +164,10 @@ rule build_model:
 
         tf.keras.utils.plot_model(get_base_model(),to_file="model.png")
 
-        X_train = np.loadtxt(str(input[1]))
-        y_train = np.loadtxt(str(input[2]))
-        X_val = np.loadtxt(str(input[3]))
-        y_val = np.loadtxt(str(input[4]))
+        X_train = np.loadtxt(str(input[0]))
+        y_train = np.loadtxt(str(input[1]))
+        X_val = np.loadtxt(str(input[2]))
+        y_val = np.loadtxt(str(input[3]))
 
         optimizer = keras.optimizers.Adam(lr=0.001)
         model = get_base_model()
